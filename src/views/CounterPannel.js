@@ -1,81 +1,72 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types';
+import store from '../Store.js';
+import * as Actions from '../Actions.js';
 
-class CounterPannel extends Component{
-    constructor(props){
-        console.log('constructor...'+props.caption)
+
+class CounterPannel extends Component {
+    constructor(props) {
+        console.log('constructor...' + props.caption)
         super(props)
-        let caption = props.caption
-        let currentVal = props.value
         this.addNum = this.addNum.bind(this)
         this.minusNum = this.minusNum.bind(this)
-        this.state = {
-            caption,
-            currentVal
-        }
+        this.onChange = this.onChange.bind(this)
+        this.getOwnState = this.getOwnState.bind(this)
+        this.state = this.getOwnState()
     }
-    componentWillMount(){
-        console.log('componentWillMount...'+this.state.caption)
+    getOwnState() {
+        return {
+            value: store.getState()[this.props.caption]
+        };
     }
-    render(){
-        console.log('render...'+this.state.caption)
-        const currentVal = this.state.currentVal
-        const {caption} = this.props;
-        return(
+    onChange(){
+        this.setState(this.getOwnState())
+    }
+    render() {
+        const currentVal = this.state.value
+        const { caption } = this.props;
+        return (
             <div className="counter-wrapper">
-                <button className="minus">
-                -
+                <button className="minus" onClick={this.minusNum}>
+                    -
                 </button>
                 <span className="number">
-                {currentVal}
+                    {currentVal}
                 </span>
                 <button className="plus" onClick={this.addNum}>
-                +
+                    +
                 </button>
                 <span>{caption}</span>
             </div>
         )
     }
-    componentDidMount(){
-        console.log('componentDidMount...'+this.state.caption)
+    shouldComponentUpdate(nextProps, nextState) {
+        return (nextProps.caption !== this.props.caption) || (nextState.value !== this.state.value)
     }
-    componentWillReceiveProps(nextProps){
-        //更改state不会触发这个钩子，因为这个钩子是根据props来计算是否要更新state，
-        //如果state再触发这个钩子，就造成死循环
-        console.log('componentWillReceiveProps...'+this.state.caption)
+    addNum() {
+        store.dispatch(Actions.increment(this.props.caption))
     }
-    shouldComponentUpdate(nextProps,nextState){
-        console.log('shouldComponentUpdate...'+this.state.caption)
-        console.log(nextProps)
-        console.log(nextState)
-        return true
+    minusNum() {
+        store.dispatch(Actions.decrement(this.props.caption))
     }
-    componentWillUpdate(){
-        console.log('componentWillUpdate...'+this.state.caption)
+    componentDidMount() {
+        store.subscribe(this.onChange);
     }
-    componentDidUpdate(){
-        console.log('componentDidUpdate...'+this.state.caption)
+    componentWillUnmount() {
+        store.unsubscribe(this.onChange);
     }
-    componentWillUnmount(){
-        console.log('componentWillUnmount...'+this.state.caption)
-    }
-
-    addNum(){
-        //true表示增加，false表示减少
-        this.updateCount(true)
-    }
-    minusNum(){
-        this.updateCount(false)
-    }
-    updateCount(isIncrement){
-        const previousValue = this.state.currentVal
-        const newVal = isIncrement?previousValue+1:previousValue-1
-        this.setState({
-            currentVal:newVal
-        })
-    }
+    
 }
-// CounterPannel.propsType = {
-//     caption:props.string.isrequired
-// }
 
+CounterPannel.propTypes = {
+    caption: PropTypes.string.isRequired,
+    initValue: PropTypes.number,
+    onUpdate: PropTypes.func
+};
+
+
+CounterPannel.defaultProps = {
+    initValue: 0,
+    onUpdate: f => f //什么都不做的函数
+};
 export default CounterPannel

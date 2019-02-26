@@ -1,9 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import ControlPannel from './views/ControlPannel'
 import * as serviceWorker from './serviceWorker';
+import {Provider} from 'react-redux';
+import store from './Store.js';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+
+ReactDOM.render(
+    <Provider store={store}>
+        <ControlPannel />
+    </Provider>, 
+document.getElementById('root'));
 
 serviceWorker.unregister();
