@@ -1,12 +1,32 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types';
 import store from '../Store.js';
 import * as Actions from '../Actions.js';
 
 
-class CounterPannel extends Component {
+class Counter extends Component {
+    render() {
+        const {caption, onIncrement, onDecrement, value} = this.props;
+        return (
+            <div className="counter-wrapper">
+                <button className="minus" onClick={onDecrement}>
+                    -
+                </button>
+                <span className="number">
+                    {value}
+                </span>
+                <button className="plus" onClick={onIncrement}>
+                    +
+                </button>
+                <span>{caption}</span>
+            </div>
+        )
+    }
+}
+
+
+
+class CounterContainer extends Component{
     constructor(props) {
-        console.log('constructor...' + props.caption)
         super(props)
         this.addNum = this.addNum.bind(this)
         this.minusNum = this.minusNum.bind(this)
@@ -22,24 +42,20 @@ class CounterPannel extends Component {
     onChange(){
         this.setState(this.getOwnState())
     }
-    render() {
-        const currentVal = this.state.value
+
+    render(){
+        const value = this.state.value
         const { caption } = this.props;
         return (
-            <div className="counter-wrapper">
-                <button className="minus" onClick={this.minusNum}>
-                    -
-                </button>
-                <span className="number">
-                    {currentVal}
-                </span>
-                <button className="plus" onClick={this.addNum}>
-                    +
-                </button>
-                <span>{caption}</span>
-            </div>
+            <Counter 
+                value={value} 
+                caption={caption}
+                onIncrement={this.addNum}
+                onDecrement={this.minusNum}
+            ></Counter>
         )
     }
+
     shouldComponentUpdate(nextProps, nextState) {
         return (nextProps.caption !== this.props.caption) || (nextState.value !== this.state.value)
     }
@@ -55,18 +71,5 @@ class CounterPannel extends Component {
     componentWillUnmount() {
         store.unsubscribe(this.onChange);
     }
-    
 }
-
-CounterPannel.propTypes = {
-    caption: PropTypes.string.isRequired,
-    initValue: PropTypes.number,
-    onUpdate: PropTypes.func
-};
-
-
-CounterPannel.defaultProps = {
-    initValue: 0,
-    onUpdate: f => f //什么都不做的函数
-};
-export default CounterPannel
+export default CounterContainer
