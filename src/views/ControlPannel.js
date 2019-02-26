@@ -13,7 +13,6 @@ class ControlPannel extends Component {
                 <CounterPannel caption="Third"></CounterPannel>
                 <Summary></Summary>
                 <hr />
-                <button onClick={() => this.forceUpdate()}>force repaint</button>
             </div>
         )
     }
